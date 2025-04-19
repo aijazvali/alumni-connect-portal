@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
 
-interface Comment {
-  text: string;
-  author: string;
-  createdAt: string;
-}
-
 interface Post {
   _id: string;
   name: string;
@@ -13,7 +7,7 @@ interface Post {
   content: string;
   imageUrl?: string;
   timestamp: string;
-  comments?: Comment[];
+  comments?: { text: string; author: string; createdAt: string }[];
 }
 
 export default function Feed() {
@@ -21,15 +15,20 @@ export default function Feed() {
   const [newPost, setNewPost] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+  const BACKEND_URL = "https://alumni-connect-portal.onrender.com";
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("userName");
     setToken(storedToken);
+    setCurrentUser(storedUser);
     fetchPosts();
   }, []);
 
   const fetchPosts = async () => {
-    const res = await fetch("http://localhost:5000/api/posts");
+    const res = await fetch(`${BACKEND_URL}/api/posts`);
     const data = await res.json();
     setPosts(data);
   };
@@ -43,10 +42,10 @@ export default function Feed() {
     if (image) formData.append("image", image);
 
     try {
-      const res = await fetch("http://localhost:5000/api/posts", {
+      const res = await fetch(`${BACKEND_URL}/api/posts`, {
         method: "POST",
         headers: {
-          Authorization: token || "", // ⚠️ Don't set 'Content-Type' here — browser will set it for FormData
+          Authorization: token || "",
         },
         body: formData,
       });
@@ -63,6 +62,29 @@ export default function Feed() {
       console.error(err);
     }
   };
+
+  const handleComment = async (postId: string, commentText: string) => {
+    if (!commentText.trim()) return;
+
+    try {
+      await fetch(`${BACKEND_URL}/api/posts/${postId}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: commentText,
+          author: currentUser || "Guest",
+        }),
+      });
+
+      fetchPosts();
+    } catch (err) {
+      console.error("Failed to add comment:", err);
+    }
+  };
+
+  const [commentInputs, setCommentInputs] = useState<{ [key: string]: string }>({});
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -109,54 +131,40 @@ export default function Feed() {
 
             {post.imageUrl && (
               <img
-                src={`http://localhost:5000${post.imageUrl}`}
+                src={`${BACKEND_URL}${post.imageUrl}`}
                 alt="Post image"
                 className="rounded max-w-full border mb-3"
               />
             )}
 
-            {/* ✅ Show comments */}
+            {/* Comments Section */}
             <div className="space-y-2 mt-3">
               {post.comments?.map((comment, idx) => (
-                <div key={idx} className="text-sm text-gray-300">
+                <div key={idx} className="text-sm text-gray-300 space-y-1">
                   💬 <strong>{comment.author}</strong>: {comment.text}
                 </div>
               ))}
             </div>
 
-            {/* ✅ Comment form */}
+            {/* Comment Form */}
             <form
-              onSubmit={async (e) => {
+              onSubmit={(e) => {
                 e.preventDefault();
-                const input = e.currentTarget.elements.namedItem(
-                  "comment"
-                ) as HTMLInputElement;
-                const text = input?.value.trim();
-                if (!text) return;
-
-                const author = localStorage.getItem("userName") || "Guest";
-
-                const res = await fetch(
-                  `http://localhost:5000/api/posts/${post._id}/comments`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ text, author }),
-                  }
-                );
-
-                if (res.ok) {
-                  fetchPosts(); // 🔄 reload updated post list
-                  input.value = "";
-                }
+                handleComment(post._id, commentInputs[post._id] || "");
+                setCommentInputs((prev) => ({ ...prev, [post._id]: "" }));
               }}
               className="mt-3"
             >
               <input
                 name="comment"
                 placeholder="Write a comment..."
+                value={commentInputs[post._id] || ""}
+                onChange={(e) =>
+                  setCommentInputs((prev) => ({
+                    ...prev,
+                    [post._id]: e.target.value,
+                  }))
+                }
                 className="w-full px-3 py-2 rounded bg-gray-700 text-white"
               />
             </form>
