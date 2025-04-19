@@ -15,7 +15,8 @@
     "next": "^15.3.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-fontawesome": "^1.7.1"
+    "react-fontawesome": "^1.7.1",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
