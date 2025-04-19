@@ -3,15 +3,19 @@ import Message from "../models/Message.js";
 
 const router = express.Router();
 
-// POST message
+// POST a new message
 router.post("/", async (req, res) => {
+  const { senderId, receiverId, message } = req.body;
+
+  // ✅ Debug Log to verify request
+  console.log("Incoming message to save:", { senderId, receiverId, message });
+
+  if (!senderId || !receiverId || !message) {
+    console.warn("❌ Missing message data");
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
   try {
-    const { senderId, receiverId, message } = req.body;
-
-    if (!senderId || !receiverId || !message) {
-      return res.status(400).json({ error: "Missing fields" });
-    }
-
     const newMessage = new Message({
       senderId,
       receiverId,
@@ -19,15 +23,17 @@ router.post("/", async (req, res) => {
       timestamp: new Date()
     });
 
-    await newMessage.save();
-    res.status(201).json(newMessage);
+    const saved = await newMessage.save();
+    console.log("✅ Message saved:", saved);  // Debug log to confirm save
+
+    res.status(201).json(saved);
   } catch (err) {
-    console.error("Error saving message:", err);
+    console.error("❌ Error saving message to DB:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// GET messages between two users
+// GET all messages between two users
 router.get("/:senderId/:receiverId", async (req, res) => {
   const { senderId, receiverId } = req.params;
 
@@ -41,7 +47,7 @@ router.get("/:senderId/:receiverId", async (req, res) => {
 
     res.json(messages);
   } catch (err) {
-    console.error("Error fetching messages:", err);
+    console.error("❌ Error fetching messages:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
