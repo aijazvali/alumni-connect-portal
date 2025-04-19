@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
   location:{
     type:String,
     required:true
+  },
+  image:{
+    type:String,
+    required:false
   }
     
 }, { timestamps: true });

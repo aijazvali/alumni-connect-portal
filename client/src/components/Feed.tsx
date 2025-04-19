@@ -131,7 +131,7 @@ export default function Feed() {
 
             {post.imageUrl && (
               <img
-                src={`${BACKEND_URL}${post.imageUrl}`}
+                src={post.imageUrl}
                 alt="Post image"
                 className="rounded max-w-full border mb-3"
               />
