@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import http from "http";
 import { Server } from "socket.io";
-
+import userRoutes from "./routes/users.js";
 import connectDB from "./db.js";
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/posts.js";
@@ -30,6 +30,7 @@ app.get("/", (req, res) => res.send("Alumni Connect API Running"));
 app.use("/api", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/users", userRoutes);
 app.get("/alumni", alumnifetch);
 
 // ✅ Create HTTP server and wrap socket.io
