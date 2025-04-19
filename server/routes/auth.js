@@ -10,7 +10,7 @@ const router = express.Router();
 // ✅ Register
 router.post("/register", async (req, res) => {
   console.log("📥 REGISTER REQUEST:", req.body);
-  const { name, email, password, role, batch ,jobtitle,branch,location} = req.body;
+  const { name, email, password, role, batch ,jobtitle,branch,location,image} = req.body;
 
   if (!name || !email || !password || !role || !batch || !jobtitle || !branch || !location) {
     return res.status(400).json({ message: "All fields are required" });
@@ -22,7 +22,7 @@ router.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new User({ name, email, password: hashedPassword, role, batch,jobtitle,branch,location });
+    const user = new User({ name, email, password: hashedPassword, role, batch,jobtitle,branch,location,image });
     await user.save();
 
     return res.status(201).json({ message: "User registered successfully" });

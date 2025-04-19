@@ -13,6 +13,7 @@ interface Alumni {
   branch: string;
   jobtitle:string;
   location:string;
+  image:string;
 }
 
 

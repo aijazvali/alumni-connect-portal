@@ -59,12 +59,12 @@ export default function Navbar() {
         <Link href="/" className="hover:text-blue-400">Home</Link>
         <Link href="/alumni" className="hover:text-blue-400">Alumni</Link>
         {auth.user && <Link href="/profile">Profile</Link>}
-
+        
         {userInfo ? (
           <>
-            <span className="text-sm text-gray-300">
-              👤 {userInfo.name} ({userInfo.role})
-            </span>
+            <Link href="/user">
+            👤 {userInfo.name} ({userInfo.role})
+            </Link>
             <Link href="/dashboard" className="hover:text-blue-400">
               Dashboard
             </Link>

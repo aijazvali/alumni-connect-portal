@@ -13,8 +13,6 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
   const [chat, setChat] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log("✅ Chat component mounted with:", { currentUserId, selectedUserId });
-
     if (!currentUserId || !selectedUserId) return;
 
     socket.emit("join", currentUserId);
@@ -23,7 +21,6 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setChat(data);
-        else console.error("❌ Unexpected chat response:", data);
       });
 
     socket.on("private_message", (data) => {
@@ -40,18 +37,20 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
   const handleSend = async () => {
     if (!message.trim()) return;
 
-    if (!currentUserId || !selectedUserId || currentUserId === "undefined" || selectedUserId === "undefined") {
+    const senderId = currentUserId;
+    const receiverId = selectedUserId;
+
+    if (!senderId || !receiverId || senderId === "undefined" || receiverId === "undefined") {
       alert("❌ senderId or receiverId is missing.");
       return;
     }
 
     const newMsg = {
-      senderId: currentUserId,
-      receiverId: selectedUserId,
+      senderId,
+      receiverId,
       message,
     };
 
-    console.log("📨 Sending message:", newMsg);
     socket.emit("private_message", newMsg);
 
     try {
@@ -62,12 +61,12 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
       });
 
       const saved = await res.json();
-      console.log("✅ Message saved to DB:", saved);
+      console.log("✅ Message saved:", saved);
 
       setChat((prev) => [...prev, { ...newMsg, timestamp: new Date() }]);
       setMessage("");
     } catch (err) {
-      console.error("❌ Message save failed:", err);
+      console.error("❌ Failed to save message:", err);
     }
   };
 

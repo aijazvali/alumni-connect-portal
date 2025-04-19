@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/posts.js";
 import messageRoutes from "./routes/messages.js";
 import alumnifetch from "./controllers/alumnifetch.js";
+import userRoutesK from "./routes/userRoutes.js"
 
 dotenv.config();
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 app.get("/alumni", alumnifetch);
+app.use("/api/user",userRoutesK);
 
 // ✅ Create HTTP server and wrap socket.io
 const server = http.createServer(app);

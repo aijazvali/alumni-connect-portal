@@ -127,13 +127,13 @@ function Page() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
             {alumni.map((alum, indx) => (
-              <div key={indx} className="border p-4 rounded shadow flex text-blue-400 gap-4">
-                <div className="max-w-[50%]">
-                  <img
-                    src="https://static.vecteezy.com/system/resources/previews/009/368/313/non_2x/scholarship-pixel-perfect-rgb-color-icon-for-dark-theme-financial-support-for-student-state-offered-grant-simple-filled-line-drawing-on-night-mode-background-editable-stroke-vector.jpg"
-                    className="w-full h-auto object-contain"
-                    alt="Alumni avatar"
-                  />
+              <div key={indx} className="border p-4 rounded shadow flex text-blue-400 gap-4 ">
+                <div className="max-w-[50%] flex items-center">
+                <img
+                  src={alum.image || "https://static.vecteezy.com/system/resources/previews/009/368/313/non_2x/scholarship-pixel-perfect-rgb-color-icon-for-dark-theme-financial-support-for-student-state-offered-grant-simple-filled-line-drawing-on-night-mode-background-editable-stroke-vector.jpg"}
+                  className="w-full h-auto object-contain rounded-lg"
+                  alt="Alumni avatar"
+                />
                 </div>
                 <div className="flex flex-col justify-around gap-2">
                   <h2 className="text-xl text-blue-600 font-semibold">{alum.name}</h2>
