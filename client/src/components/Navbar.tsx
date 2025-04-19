@@ -94,6 +94,25 @@ export default function Navbar() {
           </>
         )}
       </div>
+      <ul className="flex gap-4 items-center">
+        <li>
+          <Link href="/">Home</Link>
+        </li>
+        <li>
+          <Link href="/alumni">Alumni</Link>
+        </li>
+        <li>
+          <Link href="/dashboard">Dashboard</Link>
+        </li>
+        <li>
+          <Link href="/chat">
+            <span className="text-pink-400 font-semibold">Messages</span>
+          </Link>
+        </li>
+        <li>
+          <button onClick={handleLogout}>Logout</button>
+        </li>
+      </ul>
     </nav>
   );
 }
