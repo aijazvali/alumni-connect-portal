@@ -19,7 +19,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://alumni-connect-portal.onrender.com", {
+      const res = await fetch("https://alumni-connect-portal.onrender.com/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
