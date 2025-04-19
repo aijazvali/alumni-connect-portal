@@ -5,6 +5,9 @@ import connectDB from "./db.js";
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/posts.js";
 import path from "path";
+import alumnifetch from "./controllers/alumnifetch.js"
+
+
 
 dotenv.config();
 const app = express();
@@ -29,6 +32,8 @@ connectDB();
 app.get("/", (req, res) => res.send("✅ Alumni Connect API Running"));
 app.use("/api", authRoutes);
 app.use("/api/posts", postRoutes);
+app.get("/alumni",alumnifetch);
+
 
 // ✅ Start server
 app.listen(PORT, () => {

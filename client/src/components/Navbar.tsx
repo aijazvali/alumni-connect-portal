@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { authhook } from "@/authcontext/Authcontext";
 
 export default function Navbar() {
+  const auth = authhook();
   const [userInfo, setUserInfo] = useState<{
     name?: string;
     role?: string;
@@ -59,7 +61,11 @@ export default function Navbar() {
         <Link href="/" className="hover:text-blue-400">
           Home
         </Link>
+        <Link href="/alumni" className="hover:text-blue-400">
+          Alumni
+        </Link>
 
+        {auth.user && <Link href="/profile">Profile</Link>}
         {userInfo ? (
           <>
             {/* ✅ Show logged-in user's name and role */}
