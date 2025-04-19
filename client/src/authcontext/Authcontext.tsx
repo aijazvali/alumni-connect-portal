@@ -48,24 +48,6 @@ export default function Authcontext({children}:{children:ReactNode}){
     const [user,setUser]=useState<null>(null);
     const [alumni,setAlumni]=useState<Alumni[]>([]);
 
-    // const fetchauthentication=async ()=>{
-    //     try{
-    //         const res=await fetch("http://localhost:5000/auth/authenticate",{method:"GET",credentials:"include"})
-    //         const result=await res.json()
-    //         if(result){
-    //             setUser(result.userid)
-    //         }
-    //     }catch(err){
-    //         setUser(null);
-    //         console.log(err);
-    //     }
-
-    // }
-    // useEffect(()=>{
-    //     fetchauthentication();
-    // },[])
-
-
     const fetchAlumniByFilter = async () => {
       try {
 
