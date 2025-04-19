@@ -28,15 +28,6 @@ const verifyToken = (req, res, next) => {
 };
 
 // Store images in /uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext);
-  }
-});
 
 const upload = multer({ storage });
 
