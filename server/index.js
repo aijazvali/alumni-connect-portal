@@ -2,70 +2,42 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
-import http from "http"; // ✅ Required for Socket.io
-
-const { Server } = await import("socket.io");
-
+import http from "http";
+import { Server } from "socket.io";
 
 import connectDB from "./db.js";
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/posts.js";
-import messageRoutes from "./routes/messages.js"; // ✅ new route
+import messageRoutes from "./routes/messages.js";
 import alumnifetch from "./controllers/alumnifetch.js";
 
 dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const start = async () => {
-  const { Server } = await import("socket.io");
-
-  const server = http.createServer(app);
-  const io = new Server(server, {
-    cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
-    }
-  });
-
-  io.on("connection", (socket) => {
-    console.log("🟢 Socket connected:", socket.id);
-    // ...
-  });
-
-  server.listen(PORT, () => {
-    console.log(`✅ Server running at http://localhost:${PORT}`);
-  });
-};
-
-start();
-
-
-// ✅ Enable CORS
 app.use(cors({
-  origin: "*", // Change this to your Vercel frontend URL in production
+  origin: "*",
   credentials: true
 }));
 
 app.use(express.json());
-app.use("/uploads", express.static("uploads")); // (used for old posts)
+app.use("/uploads", express.static("uploads"));
 
 connectDB();
 
-// ✅ API Routes
+// API Routes
 app.get("/", (req, res) => res.send("Alumni Connect API Running"));
 app.use("/api", authRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/messages", messageRoutes); // ✅ new message route
+app.use("/api/messages", messageRoutes);
 app.get("/alumni", alumnifetch);
 
-// ✅ Set up server with Socket.io
+// ✅ Create HTTP server and wrap socket.io
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Replace this with your frontend URL for production
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
@@ -93,6 +65,7 @@ io.on("connection", (socket) => {
   });
 });
 
+// ✅ ONLY use server.listen (no app.listen)
 server.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
