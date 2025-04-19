@@ -7,11 +7,10 @@ import postRoutes from "./routes/posts.js";
 import path from "path";
 
 dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ FIX: CORS settings to allow Vercel and localhost with preflight support
+// ✅ CORS for localhost and Vercel
 app.use(cors({
   origin: [
     "http://localhost:3000",
@@ -24,19 +23,18 @@ app.use(cors({
 
 app.use(express.json());
 
+// ✅ Static files for images (⚠️ Render deletes these after a while)
+app.use("/uploads", express.static("uploads"));
+
+// ✅ Connect DB
 connectDB();
 
-app.get("/", (req, res) => {
-  res.send("Alumni Connect Backend is Live! 🚀");
-});
-
+// ✅ Routes
+app.get("/", (req, res) => res.send("✅ Alumni Connect API Running"));
 app.use("/api", authRoutes);
 app.use("/api/posts", postRoutes);
 
-// Serve uploaded images
-app.use("/uploads", express.static("uploads"));
-
-// Start the server
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
