@@ -1,0 +1,168 @@
+import { useEffect, useState } from "react";
+
+interface Comment {
+  text: string;
+  author: string;
+  createdAt: string;
+}
+
+interface Post {
+  _id: string;
+  name: string;
+  role: string;
+  content: string;
+  imageUrl?: string;
+  timestamp: string;
+  comments?: Comment[];
+}
+
+export default function Feed() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [newPost, setNewPost] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    const res = await fetch("http://localhost:5000/api/posts");
+    const data = await res.json();
+    setPosts(data);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPost.trim()) return;
+
+    const formData = new FormData();
+    formData.append("content", newPost);
+    if (image) formData.append("image", image);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: {
+          Authorization: token || "", // ⚠️ Don't set 'Content-Type' here — browser will set it for FormData
+        },
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setPosts([data, ...posts]);
+        setNewPost("");
+        setImage(null);
+      } else {
+        alert("❌ Failed to post");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      {token && (
+        <form onSubmit={handleSubmit} className="mb-6 space-y-3">
+          <textarea
+            value={newPost}
+            onChange={(e) => setNewPost(e.target.value)}
+            placeholder="Write your update here..."
+            className="w-full p-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={3}
+          ></textarea>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImage(e.target.files?.[0] || null)}
+            className="text-white"
+          />
+
+          <button
+            type="submit"
+            className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Post
+          </button>
+        </form>
+      )}
+
+      <div className="space-y-4">
+        {posts.map((post) => (
+          <div
+            key={post._id}
+            className="p-4 border border-gray-700 rounded bg-gray-800"
+          >
+            <div className="flex justify-between items-center mb-2 text-sm text-gray-400">
+              <span>
+                {post.name} ({post.role})
+              </span>
+              <span>{new Date(post.timestamp).toLocaleString()}</span>
+            </div>
+
+            <p className="text-white mb-2">{post.content}</p>
+
+            {post.imageUrl && (
+              <img
+                src={`http://localhost:5000${post.imageUrl}`}
+                alt="Post image"
+                className="rounded max-w-full border mb-3"
+              />
+            )}
+
+            {/* ✅ Show comments */}
+            <div className="space-y-2 mt-3">
+              {post.comments?.map((comment, idx) => (
+                <div key={idx} className="text-sm text-gray-300">
+                  💬 <strong>{comment.author}</strong>: {comment.text}
+                </div>
+              ))}
+            </div>
+
+            {/* ✅ Comment form */}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const input = e.currentTarget.elements.namedItem(
+                  "comment"
+                ) as HTMLInputElement;
+                const text = input?.value.trim();
+                if (!text) return;
+
+                const author = localStorage.getItem("userName") || "Guest";
+
+                const res = await fetch(
+                  `http://localhost:5000/api/posts/${post._id}/comments`,
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ text, author }),
+                  }
+                );
+
+                if (res.ok) {
+                  fetchPosts(); // 🔄 reload updated post list
+                  input.value = "";
+                }
+              }}
+              className="mt-3"
+            >
+              <input
+                name="comment"
+                placeholder="Write a comment..."
+                className="w-full px-3 py-2 rounded bg-gray-700 text-white"
+              />
+            </form>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

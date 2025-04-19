@@ -3,6 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./db.js";
 import authRoutes from "./routes/auth.js";
+import postRoutes from "./routes/posts.js";
+import path from "path";
+
+
 
 dotenv.config();
 
@@ -19,7 +23,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", authRoutes);
+app.use("/api/posts", postRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+app.use("/uploads", express.static("uploads"));
+
