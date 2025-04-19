@@ -1,46 +1,51 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-const ChatList = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+interface User {
+  _id: string;
+  name: string;
+  role: string;
+}
+
+const ChatListPage = () => {
   const router = useRouter();
+  const [users, setUsers] = useState<User[]>([]);
+
+  const currentUserId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   useEffect(() => {
-    const id = localStorage.getItem("userId");
-    setCurrentUserId(id);
-
-    // Fetch all users
     fetch("https://alumni-connect-portal.onrender.com/api/users")
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (Array.isArray(data)) {
-          // Exclude current user
-          setUsers(data.filter(user => user._id !== id));
+          setUsers(data.filter((u) => u._id !== currentUserId)); // exclude current user
         } else {
-          console.warn("Invalid user list:", data);
+          console.error("Invalid users data", data);
         }
-      });
-  }, []);
+      })
+      .catch((err) => console.error("Error fetching users", err));
+  }, [currentUserId]);
 
-  const goToChat = (userId: string) => {
-    router.push(`/chat/${userId}`);
+  const startChat = (id: string) => {
+    router.push(`/chat/${id}`);
   };
 
   return (
-    <div className="p-4 max-w-lg mx-auto mt-8">
-      <h1 className="text-2xl font-bold text-white mb-4">Private Chat</h1>
-      {users.map(user => (
-        <button
-          key={user._id}
-          onClick={() => goToChat(user._id)}
-          className="block w-full bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded mb-2 text-center"
-        >
-          {user.name} ({user.role})
-        </button>
-      ))}
+    <div className="min-h-screen bg-black text-white p-6">
+      <h1 className="text-2xl font-bold mb-4">Private Chat</h1>
+      <div className="space-y-2">
+        {users.map((user) => (
+          <button
+            key={user._id}
+            onClick={() => startChat(user._id)}
+            className="block w-full p-3 rounded bg-gray-700 hover:bg-gray-600"
+          >
+            {user.name} ({user.role})
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default ChatList;
+export default ChatListPage;
