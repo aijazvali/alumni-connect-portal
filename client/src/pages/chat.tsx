@@ -1,108 +1,46 @@
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { useRouter } from "next/router";
 
-const socket = io("https://alumni-connect-portal.onrender.com");
-
-const ChatWithUser = () => {
-  const router = useRouter();
-  const { userId } = router.query;
-
-  const [message, setMessage] = useState("");
-  const [chat, setChat] = useState<any[]>([]);
+const ChatList = () => {
+  const [users, setUsers] = useState<any[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    setCurrentUserId(storedUserId);
+    const id = localStorage.getItem("userId");
+    setCurrentUserId(id);
 
-    if (!storedUserId || !userId) return;
-
-    // Join socket room
-    socket.emit("join", storedUserId);
-
-    // Fetch message history
-    fetch(`https://alumni-connect-portal.onrender.com/api/messages/${storedUserId}/${userId}`)
-      .then((res) => res.json())
-      .then((data) => {
+    // Fetch all users
+    fetch("https://alumni-connect-portal.onrender.com/api/users")
+      .then(res => res.json())
+      .then(data => {
         if (Array.isArray(data)) {
-          setChat(data);
+          // Exclude current user
+          setUsers(data.filter(user => user._id !== id));
         } else {
-          console.error("Invalid data:", data);
-          setChat([]);
+          console.warn("Invalid user list:", data);
         }
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setChat([]);
       });
+  }, []);
 
-    // Listen for new messages
-    socket.on("private_message", (data) => {
-      if (data.senderId === userId || data.receiverId === userId) {
-        setChat((prev) => [...prev, data]);
-      }
-    });
-
-    return () => {
-      socket.off("private_message");
-    };
-  }, [userId]);
-
-  const handleSend = () => {
-    if (!message.trim() || !currentUserId || !userId) return;
-
-    const newMsg = {
-      senderId: currentUserId,
-      receiverId: userId,
-      message,
-    };
-
-    socket.emit("private_message", newMsg);
-
-    fetch("https://alumni-connect-portal.onrender.com/api/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newMsg),
-    });
-
-    setChat((prev) => [...prev, { ...newMsg, timestamp: new Date() }]);
-    setMessage("");
+  const goToChat = (userId: string) => {
+    router.push(`/chat/${userId}`);
   };
 
   return (
-    <div className="bg-gray-900 p-4 rounded shadow-md max-w-lg mx-auto mt-5">
-      <h2 className="text-lg font-bold mb-2 text-white">Private Chat</h2>
-
-      <div className="h-64 overflow-y-scroll bg-gray-800 p-2 rounded text-white">
-        {chat.map((msg, index) => (
-          <div
-            key={index}
-            className={`mb-2 ${msg.senderId === currentUserId ? "text-right" : "text-left"}`}
-          >
-            <span className="bg-gray-700 px-3 py-1 rounded inline-block">
-              {msg.message}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 flex gap-2">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="flex-1 px-3 py-2 rounded bg-gray-700 text-white"
-          placeholder="Type a message..."
-        />
+    <div className="p-4 max-w-lg mx-auto mt-8">
+      <h1 className="text-2xl font-bold text-white mb-4">Private Chat</h1>
+      {users.map(user => (
         <button
-          onClick={handleSend}
-          className="bg-blue-600 px-4 py-2 rounded text-white"
+          key={user._id}
+          onClick={() => goToChat(user._id)}
+          className="block w-full bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded mb-2 text-center"
         >
-          Send
+          {user.name} ({user.role})
         </button>
-      </div>
+      ))}
     </div>
   );
 };
 
-export default ChatWithUser;
+export default ChatList;
