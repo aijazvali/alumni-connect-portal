@@ -12,14 +12,10 @@ const PORT = process.env.PORT || 5000;
 
 // ✅ CORS for localhost and Vercel
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://alumni-connect-portal-7mt5o1pj3-aijazs-projects-5ae8e876.vercel.app"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: "*", // Temporarily allow all origins
   credentials: true
 }));
+
 
 app.use(express.json());
 
