@@ -3,7 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import http from "http"; // ✅ Required for Socket.io
-import { Server } from "socket.io";
+
+const { Server } = await import("socket.io");
+
 
 import connectDB from "./db.js";
 import authRoutes from "./routes/auth.js";
@@ -15,6 +17,30 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+const start = async () => {
+  const { Server } = await import("socket.io");
+
+  const server = http.createServer(app);
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+
+  io.on("connection", (socket) => {
+    console.log("🟢 Socket connected:", socket.id);
+    // ...
+  });
+
+  server.listen(PORT, () => {
+    console.log(`✅ Server running at http://localhost:${PORT}`);
+  });
+};
+
+start();
+
 
 // ✅ Enable CORS
 app.use(cors({
