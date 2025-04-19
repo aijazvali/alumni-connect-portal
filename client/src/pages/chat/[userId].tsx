@@ -10,13 +10,11 @@ const ChatPage = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const id = localStorage.getItem("userId");
-      if (id) setCurrentUserId(id);
-    }
+    const storedId = localStorage.getItem("userId");
+    if (storedId) setCurrentUserId(storedId);
   }, []);
 
-  if (!userId || !currentUserId || typeof userId !== "string") return <p>Loading...</p>;
+  if (!userId || typeof userId !== "string" || !currentUserId) return <p className="text-white p-5">Loading chat...</p>;
 
   return (
     <div className="min-h-screen bg-black text-white p-6">
