@@ -1,18 +1,36 @@
+// src/pages/chat/[userId].tsx
+
 import { useRouter } from "next/router";
-import Chat from "../../components/Chat";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "@/authcontext/AuthContext";
+import Chat from "@/components/Chat";
 
 const ChatPage = () => {
   const router = useRouter();
   const { userId } = router.query;
+  const { user } = useContext(AuthContext);
+  const [showChat, setShowChat] = useState(false);
 
-  const currentUserId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  useEffect(() => {
+    if (user && user._id && userId) {
+      setShowChat(true);
+    }
+  }, [user, userId]);
 
-  if (!currentUserId || !userId) return <p className="text-white p-4">Loading chat...</p>;
+  if (!user || !user._id) {
+    return <div className="text-white p-5">Loading user info...</div>;
+  }
+
+  if (!userId || typeof userId !== "string") {
+    return <div className="text-red-500 p-5">Invalid user ID.</div>;
+  }
+
+  if (!showChat) {
+    return <div className="text-white p-5">Loading chat...</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
-      <Chat currentUserId={currentUserId} selectedUserId={userId} />
-    </div>
+    <Chat currentUserId={user._id} selectedUserId={userId} />
   );
 };
 
