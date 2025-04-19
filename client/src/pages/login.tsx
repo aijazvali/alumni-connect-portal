@@ -1,8 +1,10 @@
 import Head from "next/head";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { authhook } from "@/authcontext/Authcontext";
 
 export default function Login() {
+  const auth=authhook();
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
@@ -36,6 +38,7 @@ export default function Login() {
         localStorage.setItem("userRole", data.user.role);
 
         setMessage("✅ Login successful!");
+        auth.setUser(data.user)
         router.push("/dashboard");
       } else {
         setMessage(`❌ ${data.message}`);
