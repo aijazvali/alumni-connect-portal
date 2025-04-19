@@ -1,45 +1,47 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import io from "socket.io-client";
 
 const socket = io("https://alumni-connect-portal.onrender.com");
 
-const ChatWithUser = () => {
+const UserChat = () => {
   const router = useRouter();
-  const { userId } = router.query;
+  const userId = router.query.userId as string;
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [chat, setChat] = useState<any[]>([]);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [chat, setChat] = useState<any[]>([]);
 
   useEffect(() => {
-    const storedId = localStorage.getItem("userId");
-    setCurrentUserId(storedId);
+    // Get user ID from local storage or context
+    const user = localStorage.getItem("user");
+    if (user) {
+      const parsed = JSON.parse(user);
+      setCurrentUserId(parsed._id);
+      socket.emit("join", parsed._id);
+    }
+  }, []);
 
-    if (!storedId || typeof userId !== "string") return;
+  useEffect(() => {
+    if (!currentUserId || !userId) return;
 
-    socket.emit("join", storedId);
-
-    fetch(`https://alumni-connect-portal.onrender.com/api/messages/${storedId}/${userId}`)
+    fetch(`https://alumni-connect-portal.onrender.com/api/messages/${currentUserId}/${userId}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
           setChat(data);
         } else {
-          console.warn("Expected an array but got:", data);
+          console.error("Invalid data:", data);
           setChat([]);
         }
-        setLoading(false);
       })
       .catch((err) => {
-        console.error("Fetch failed:", err);
+        console.error("Fetch error:", err);
         setChat([]);
-        setLoading(false);
       });
 
     socket.on("private_message", (data) => {
-      if (data.senderId === userId || data.receiverId === userId) {
+      if (data.senderId === userId) {
         setChat((prev) => [...prev, data]);
       }
     });
@@ -47,60 +49,47 @@ const ChatWithUser = () => {
     return () => {
       socket.off("private_message");
     };
-  }, [userId]);
+  }, [userId, currentUserId]);
 
   const handleSend = () => {
-    if (!message.trim() || !currentUserId || typeof userId !== "string") return;
+    if (!message.trim() || !currentUserId || !userId) return;
 
-    const newMsg = {
+    const msgData = {
       senderId: currentUserId,
       receiverId: userId,
       message,
     };
 
-    socket.emit("private_message", newMsg);
+    socket.emit("private_message", msgData);
+    setChat((prev) => [...prev, { ...msgData, timestamp: new Date() }]);
 
     fetch("https://alumni-connect-portal.onrender.com/api/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newMsg),
+      body: JSON.stringify(msgData),
     });
 
-    setChat((prev) => [...prev, { ...newMsg, timestamp: new Date() }]);
     setMessage("");
   };
 
-  if (!currentUserId || typeof userId !== "string") {
-    return (
-      <div className="text-center text-white mt-10">
-        🔄 Initializing chat...
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="text-center text-white mt-10">
-        📡 Loading messages...
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-gray-900 p-4 rounded shadow-md max-w-lg mx-auto mt-5">
-      <h2 className="text-lg font-bold mb-2 text-white">Private Chat</h2>
-
-      <div className="h-64 overflow-y-scroll bg-gray-800 p-2 rounded text-white">
-        {chat.map((msg, i) => (
-          <div key={i} className={`mb-2 ${msg.senderId === currentUserId ? "text-right" : "text-left"}`}>
+    <div className="bg-gray-900 min-h-screen text-white p-4">
+      <h2 className="text-xl font-bold mb-4">Private Chat</h2>
+      <div className="bg-gray-800 p-4 rounded h-96 overflow-y-auto mb-4">
+        {chat.map((msg, index) => (
+          <div
+            key={index}
+            className={`mb-2 ${
+              msg.senderId === currentUserId ? "text-right" : "text-left"
+            }`}
+          >
             <span className="bg-gray-700 px-3 py-1 rounded inline-block">
               {msg.message}
             </span>
           </div>
         ))}
       </div>
-
-      <div className="mt-4 flex gap-2">
+      <div className="flex gap-2">
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -118,4 +107,4 @@ const ChatWithUser = () => {
   );
 };
 
-export default ChatWithUser;
+export default UserChat;
