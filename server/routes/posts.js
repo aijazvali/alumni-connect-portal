@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import Post from "../models/Post.js";
 import multer from "multer";
 import path from "path";
-import multer from "multer";
 import { storage } from "../utils/cloudinary.js"; // adjust path if needed
 
 
