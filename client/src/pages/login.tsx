@@ -37,6 +37,7 @@ export default function Login() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userRole", data.user.role);
+        localStorage.setItem("userId", data.user._id); // 👈 Make sure this exists in backend response
 
         setMessage("✅ Login successful!");
         auth.setUser(data.user)

@@ -11,7 +11,6 @@ export default function Navbar() {
   } | null>(null);
   const router = useRouter();
 
-  // ✅ Check for token and user info in localStorage
   const checkAuth = () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -31,7 +30,6 @@ export default function Navbar() {
   useEffect(() => {
     checkAuth();
 
-    // ✅ Re-check whenever route changes (e.g., after login/logout)
     const handleRouteChange = () => {
       checkAuth();
     };
@@ -42,11 +40,11 @@ export default function Navbar() {
     };
   }, [router]);
 
-  // ✅ Logout function
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("userId");
     setUserInfo(null);
     router.push("/login");
   };
@@ -56,24 +54,22 @@ export default function Navbar() {
       <h1 className="text-xl font-bold text-blue-400">
         <Link href="/">Alumni Connect</Link>
       </h1>
-      <div className="flex items-center gap-4">
-        {/* 🏠 Home link shown to everyone */}
-        <Link href="/" className="hover:text-blue-400">
-          Home
-        </Link>
-        <Link href="/alumni" className="hover:text-blue-400">
-          Alumni
-        </Link>
 
+      <div className="flex items-center gap-4">
+        <Link href="/" className="hover:text-blue-400">Home</Link>
+        <Link href="/alumni" className="hover:text-blue-400">Alumni</Link>
         {auth.user && <Link href="/profile">Profile</Link>}
+
         {userInfo ? (
           <>
-            {/* ✅ Show logged-in user's name and role */}
             <span className="text-sm text-gray-300">
               👤 {userInfo.name} ({userInfo.role})
             </span>
             <Link href="/dashboard" className="hover:text-blue-400">
               Dashboard
+            </Link>
+            <Link href="/chat" className="text-pink-400 font-semibold hover:underline">
+              Messages
             </Link>
             <button
               onClick={handleLogout}
@@ -84,35 +80,11 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            {/* ✅ Show login/register if user is not logged in */}
-            <Link href="/login" className="hover:text-blue-400">
-              Login
-            </Link>
-            <Link href="/register" className="hover:text-blue-400">
-              Register
-            </Link>
+            <Link href="/login" className="hover:text-blue-400">Login</Link>
+            <Link href="/register" className="hover:text-blue-400">Register</Link>
           </>
         )}
       </div>
-      <ul className="flex gap-4 items-center">
-        <li>
-          <Link href="/">Home</Link>
-        </li>
-        <li>
-          <Link href="/alumni">Alumni</Link>
-        </li>
-        <li>
-          <Link href="/dashboard">Dashboard</Link>
-        </li>
-        <li>
-          <Link href="/chat">
-            <span className="text-pink-400 font-semibold">Messages</span>
-          </Link>
-        </li>
-        <li>
-          <button onClick={handleLogout}>Logout</button>
-        </li>
-      </ul>
     </nav>
   );
 }
