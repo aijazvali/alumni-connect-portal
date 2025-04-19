@@ -72,7 +72,7 @@ export default function Authcontext({children}:{children:ReactNode}){
         console.log("fetching form frontend....")
         console.log(inputval);
         const query = new URLSearchParams(inputval as Record<string, string>).toString();
-        const res = await fetch(`http://localhost:5000/alumni?${query}`, {
+        const res = await fetch(`https://alumni-connect-portal.onrender.com/alumni?${query}`, {
           method: "GET"
         });
     
