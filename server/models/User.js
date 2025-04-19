@@ -24,7 +24,20 @@ const userSchema = new mongoose.Schema({
   batch: {
     type: String,
     required: true
+  },
+  jobtitle:{
+    type:String,
+    required:true
+  },
+  branch:{
+    type:String,
+    required:true
+  },
+  location:{
+    type:String,
+    required:true
   }
+    
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

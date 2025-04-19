@@ -6,7 +6,10 @@ export default function Register() {
     email: "",
     password: "",
     role: "",
-    batch: ""
+    batch: "",
+    jobtitle:"",
+    branch:"",
+    location:""
   });
 
   const [message, setMessage] = useState("");
@@ -19,7 +22,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const res = await fetch("https://alumni-connect-portal.onrender.com/api/register", {
+      const res = await fetch("http://localhost:5000/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -29,7 +32,7 @@ export default function Register() {
 
       if (res.ok) {
         setMessage("✅ Registered successfully!");
-        setFormData({ name: "", email: "", password: "", role: "", batch: "" });
+        setFormData({ name: "", email: "", password: "", role: "", batch: "" ,jobtitle:"",branch:"",location:""});
       } else {
         setMessage(`❌ ${data.message}`);
       }
@@ -88,6 +91,30 @@ export default function Register() {
           type="text"
           placeholder="Batch (e.g. 2023)"
           value={formData.batch}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="jobtitle"
+          type="text"
+          placeholder="Jobtitle"
+          value={formData.jobtitle}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="location"
+          type="text"
+          placeholder="Location"
+          value={formData.location}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="branch"
+          type="text"
+          placeholder="Branch"
+          value={formData.branch}
           onChange={handleChange}
           className="w-full px-4 py-2 border rounded"
         />

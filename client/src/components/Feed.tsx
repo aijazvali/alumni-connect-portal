@@ -17,7 +17,7 @@ export default function Feed() {
   const [token, setToken] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
-  const BACKEND_URL = "https://alumni-connect-portal.onrender.com";
+  const BACKEND_URL = "http://localhost:5000";
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");

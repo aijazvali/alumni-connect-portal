@@ -29,7 +29,7 @@ app.use("/uploads", express.static("uploads"));
 connectDB();
 
 // ✅ Routes
-app.get("/", (req, res) => res.send("✅ Alumni Connect API Running"));
+app.get("/", (req, res) => res.send("Alumni Connect API Running"));
 app.use("/api", authRoutes);
 app.use("/api/posts", postRoutes);
 app.get("/alumni",alumnifetch);
@@ -37,5 +37,5 @@ app.get("/alumni",alumnifetch);
 
 // ✅ Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

@@ -8,9 +8,11 @@ interface Alumni {
   name: string;
   email: string;
   role: "student" | "alumni";
-  batch: number;
+  batch: string;
   college: string;
   branch: string;
+  jobtitle:string;
+  location:string;
 }
 
 
@@ -21,9 +23,10 @@ interface AuthContextype{
     loading:boolean;
     setloading:Dispatch<SetStateAction<any>>;
     inputval: {
-      college: string;
       batch: string;
       branch: string;
+      jobtitle:string;
+      location:string;
     };
     setInputval:Dispatch<SetStateAction<any>>;
     alumni:Alumni[];
@@ -39,10 +42,12 @@ export const AuthProvider=createContext<AuthContextype | null>(null);
 
 export default function Authcontext({children}:{children:ReactNode}){
     
-  const [inputval, setInputval] = useState<{ college: string; batch: string; branch: string }>({
-    college: "",
+  const [inputval, setInputval] = useState<{ batch: string; branch: string;jobtitle:string;location:string; }>({
     batch: "",
-    branch: ""
+    branch: "",
+    jobtitle:"",
+    location:""
+
   });
     const [loading,setloading]=useState<boolean>(false);   
     const [user,setUser]=useState<null>(null);
@@ -54,7 +59,7 @@ export default function Authcontext({children}:{children:ReactNode}){
         console.log("fetching form frontend....")
         console.log(inputval);
         const query = new URLSearchParams(inputval as Record<string, string>).toString();
-        const res = await fetch(`https://alumni-connect-portal.onrender.com/alumni?${query}`, {
+        const res = await fetch(`http://localhost:5000/alumni?${query}`, {
           method: "GET"
         });
     
