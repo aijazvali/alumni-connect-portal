@@ -3,31 +3,46 @@ import Message from "../models/Message.js";
 
 const router = express.Router();
 
-// Send a new message
+// POST message
 router.post("/", async (req, res) => {
   try {
     const { senderId, receiverId, message } = req.body;
-    const newMsg = new Message({ senderId, receiverId, message });
-    const saved = await newMsg.save();
-    res.status(201).json(saved);
+
+    if (!senderId || !receiverId || !message) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    const newMessage = new Message({
+      senderId,
+      receiverId,
+      message,
+      timestamp: new Date()
+    });
+
+    await newMessage.save();
+    res.status(201).json(newMessage);
   } catch (err) {
-    res.status(500).json({ error: "Message not sent." });
+    console.error("Error saving message:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// Fetch chat between two users
-router.get("/:userId/:partnerId", async (req, res) => {
+// GET messages between two users
+router.get("/:senderId/:receiverId", async (req, res) => {
+  const { senderId, receiverId } = req.params;
+
   try {
-    const { userId, partnerId } = req.params;
     const messages = await Message.find({
       $or: [
-        { senderId: userId, receiverId: partnerId },
-        { senderId: partnerId, receiverId: userId },
-      ],
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId }
+      ]
     }).sort({ timestamp: 1 });
+
     res.json(messages);
   } catch (err) {
-    res.status(500).json({ error: "Could not fetch messages." });
+    console.error("Error fetching messages:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
