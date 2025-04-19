@@ -3,7 +3,11 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Post from "../models/Post.js";
 import multer from "multer";
-import path from "path"
+import path from "path";
+import multer from "multer";
+import { storage } from "../utils/cloudinary.js"; // adjust path if needed
+
+
 
 dotenv.config();
 
@@ -48,7 +52,7 @@ router.post("/", verifyToken, upload.single("image"), async (req, res) => {
         name: req.user.name,
         role: req.user.role,
         content,
-        imageUrl
+        imageUrl: req.file ? req.file.path : null
       });
   
       const saved = await post.save();
