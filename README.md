@@ -17,7 +17,7 @@ Back2Campus is a web-based platform that connects current students and alumni fr
 - Backend: Node.js, Express.js  
 - Database: MongoDB (Cloud via Atlas)  
 - Media Hosting: Cloudinary  
-- Real-time Communication: Socket.io
+- Real-time Communication: Socket.io(Some Errors)
 
 ---
 
