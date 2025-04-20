@@ -68,7 +68,7 @@ export default function Navbar() {
 
       {/* ✅ Responsive Navigation Links */}
       <div className={`mt-3 sm:mt-0 ${isOpen ? "block" : "hidden"} sm:flex sm:items-center sm:justify-end sm:gap-6`}>
-        <Link href="/home" className="block py-2 sm:py-0 hover:text-blue-400">Home</Link>
+        <Link href="/home" className="block py-2 sm:py-0 hover:text-blue-400">Feed</Link>
         <Link href="/alumni" className="block py-2 sm:py-0 hover:text-blue-400">Alumni</Link>
         {auth.user && (
           <Link href="/profile" className="block py-2 sm:py-0 hover:text-blue-400">Profile</Link>
