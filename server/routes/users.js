@@ -6,7 +6,7 @@ const router = express.Router();
 // GET all users
 router.get("/", async (req, res) => {
   try {
-    const users = await User.find().select("_id name role");
+    const users = await User.find().select("_id name role image");
     res.json(users);
   } catch (err) {
     console.error("Error fetching users:", err);

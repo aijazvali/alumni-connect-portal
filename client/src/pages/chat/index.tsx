@@ -5,6 +5,7 @@ interface User {
   _id: string;
   name: string;
   role: string;
+  image?: string;
 }
 
 const ChatListPage = () => {
@@ -36,9 +37,11 @@ const ChatListPage = () => {
             className="w-full p-4 rounded-xl shadow-lg bg-gradient-to-br from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 transition-transform transform hover:scale-105 text-left"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-semibold">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
+              <img
+                src={user.image || "/default-avatar.png"}
+                alt={user.name}
+                className="w-12 h-12 rounded-full object-cover border-2 border-blue-600"
+              />
               <div>
                 <div className="text-lg font-semibold text-white">{user.name}</div>
                 <div className="text-sm text-gray-300">{user.role}</div>
