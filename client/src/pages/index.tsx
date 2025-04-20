@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const fullText = 'Welcome to Alumni Connect';
+const fullText = 'Welcome to 🎓back2campus';
 
 export default function Welcome() {
   const router = useRouter();
