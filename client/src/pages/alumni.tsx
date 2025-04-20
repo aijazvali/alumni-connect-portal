@@ -128,10 +128,12 @@ function Page() {
           <div className="flex flex-col items-center w-full gap-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
               {currentAlumni.map((alum, indx) => (
-                <div key={indx} className="border p-4 rounded shadow flex text-blue-400 gap-4 w-full max-h-64">
-                  
+                <div
+                  key={indx}
+                  className="border p-4 rounded shadow flex flex-col sm:flex-row text-blue-400 gap-4 w-full"
+                >
                   {/* Image Section */}
-                  <div className="w-1/2 h-full flex items-center justify-center">
+                  <div className="w-full sm:w-1/2 h-64 sm:h-auto flex items-center justify-center">
                     <img
                       src={
                         alum.image ||
@@ -143,15 +145,14 @@ function Page() {
                   </div>
 
                   {/* Text Section */}
-                  <div className="w-1/2 flex flex-col justify-around gap-2 break-words">
+                  <div className="w-full sm:w-1/2 flex flex-col justify-around gap-2 break-words">
                     <h2 className="text-xl text-blue-600 font-semibold">{alum.name}</h2>
                     <p className="break-words">{alum.email}</p>
-                    <p><span className='text-blue-300'>Branch</span>: {alum.branch}</p>
-                    <p><span className='text-blue-300'>Batch</span>: {alum.batch}</p>
-                    <p><span className='text-blue-300'>Jobtitle</span>: {alum.jobtitle}</p>
-                    <p><span className='text-blue-300'>Location</span>: {alum.location}</p>
+                    <p><span className="text-blue-300">Branch</span>: {alum.branch}</p>
+                    <p><span className="text-blue-300">Batch</span>: {alum.batch}</p>
+                    <p><span className="text-blue-300">Jobtitle</span>: {alum.jobtitle}</p>
+                    <p><span className="text-blue-300">Location</span>: {alum.location}</p>
                   </div>
-
                 </div>
               ))}
             </div>
