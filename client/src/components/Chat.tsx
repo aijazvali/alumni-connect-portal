@@ -12,8 +12,12 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<any[]>([]);
 
+  // Join socket room and fetch message history
   useEffect(() => {
-    socket.emit("join", currentUserId);
+    if (!currentUserId || !selectedUserId) return;
+
+    console.log("Joining socket room:", currentUserId);
+    socket.emit("join", currentUserId); // join own room to receive messages
 
     fetch(`https://alumni-connect-portal.onrender.com/api/messages/${currentUserId}/${selectedUserId}`)
       .then((res) => res.json())
@@ -22,8 +26,9 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
         else setChat([]);
       });
 
+    // Receive new messages
     socket.on("private_message", (data) => {
-      if (data.senderId === selectedUserId) {
+      if (data.senderId === selectedUserId || data.receiverId === selectedUserId) {
         setChat((prev) => [...prev, data]);
       }
     });
@@ -31,7 +36,7 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
     return () => {
       socket.off("private_message");
     };
-  }, [selectedUserId]);
+  }, [currentUserId, selectedUserId]);
 
   const handleSend = async () => {
     if (!message.trim()) return;
@@ -44,14 +49,21 @@ const Chat = ({ currentUserId, selectedUserId }: ChatProps) => {
 
     socket.emit("private_message", newMsg);
 
-    await fetch("https://alumni-connect-portal.onrender.com/api/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newMsg),
-    });
+    try {
+      const res = await fetch("https://alumni-connect-portal.onrender.com/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMsg),
+      });
 
-    setChat((prev) => [...prev, { ...newMsg, timestamp: new Date() }]);
-    setMessage("");
+      const saved = await res.json();
+      console.log("✅ Message saved:", saved);
+
+      setChat((prev) => [...prev, { ...newMsg, timestamp: new Date() }]);
+      setMessage("");
+    } catch (err) {
+      console.error("❌ Failed to save message:", err);
+    }
   };
 
   return (
