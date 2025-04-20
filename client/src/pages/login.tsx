@@ -42,7 +42,7 @@ export default function Login() {
         auth.setUser(data.user);
         router.push("/home");
       } else {
-        setMessage("❌ ${data.message}");
+        setMessage(`❌ ${data.message}`);
       }
     } catch (err) {
       setMessage("❌ Server error");
