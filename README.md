@@ -52,4 +52,4 @@ If you find a bug or want to suggest a feature, feel free to open an issue or pu
 
 # Author
 
-Made by [Mohd Kashif, Syed Madiha Hussain, Mohd Aijaz Vali]
+Made by [Mohd Kashif, Syed Madiha Husain, Mohd Aijaz Vali]
