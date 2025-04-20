@@ -18,6 +18,7 @@ const ChatListPage = () => {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
+          console.log("🔍 User list with image field:", data); // Debugging aid
           const filtered = data.filter((u) => u._id !== currentUserId);
           setUsers(filtered);
         }
@@ -39,6 +40,7 @@ const ChatListPage = () => {
             <div className="flex items-center gap-4">
               <img
                 src={user.image || "/default-avatar.png"}
+                onError={(e) => (e.currentTarget.src = "/default-avatar.png")}
                 alt={user.name}
                 className="w-12 h-12 rounded-full object-cover border-2 border-blue-600"
               />
