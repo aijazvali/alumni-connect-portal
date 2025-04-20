@@ -1,67 +1,176 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 interface Post {
   _id: string;
-  title: string;
-  content: string;
-  author: string;
+  name: string;
   role: string;
+  content: string;
   imageUrl?: string;
-  comments?: string[];
+  timestamp: string;
+  comments?: { text: string; author: string; createdAt: string }[];
 }
 
-const Feed = () => {
+export default function Feed() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [newPost, setNewPost] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+  const BACKEND_URL = "https://alumni-connect-portal.onrender.com";
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await axios.get("https://alumni-connect-portal.onrender.com/api/posts");
-        setPosts(res.data.reverse());
-      } catch (err) {
-        console.error("Failed to fetch posts:", err);
-      }
-    };
-
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("userName");
+    setToken(storedToken);
+    setCurrentUser(storedUser);
     fetchPosts();
   }, []);
 
+  const fetchPosts = async () => {
+    const res = await fetch(`${BACKEND_URL}/api/posts`);
+    const data = await res.json();
+    setPosts(data);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPost.trim()) return;
+
+    const formData = new FormData();
+    formData.append("content", newPost);
+    if (image) formData.append("image", image);
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/posts`, {
+        method: "POST",
+        headers: {
+          Authorization: token || "",
+        },
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setPosts([data, ...posts]);
+        setNewPost("");
+        setImage(null);
+      } else {
+        alert("❌ Failed to post");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleComment = async (postId: string, commentText: string) => {
+    if (!commentText.trim()) return;
+
+    try {
+      await fetch(`${BACKEND_URL}/api/posts/${postId}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: commentText,
+          author: currentUser || "Guest",
+        }),
+      });
+
+      fetchPosts();
+    } catch (err) {
+      console.error("Failed to add comment:", err);
+    }
+  };
+
+  const [commentInputs, setCommentInputs] = useState<{ [key: string]: string }>({});
+
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
-      <h2 className="text-2xl font-bold mb-6 text-white text-center">📢 Recent Posts</h2>
-      <div className="space-y-6">
+    <div className="max-w-2xl mx-auto">
+      {token && (
+        <form onSubmit={handleSubmit} className="mb-6 space-y-3">
+          <textarea
+            value={newPost}
+            onChange={(e) => setNewPost(e.target.value)}
+            placeholder="Write your update here..."
+            className="w-full p-3 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows={3}
+          ></textarea>
+
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImage(e.target.files?.[0] || null)}
+            className="text-white"
+          />
+
+          <button
+            type="submit"
+            className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Post
+          </button>
+        </form>
+      )}
+
+      <div className="space-y-4">
         {posts.map((post) => (
-          <div key={post._id} className="bg-gray-800 rounded-lg p-4 shadow-md text-white">
-            <div className="mb-2">
-              <span className="font-semibold">{post.author}</span>
-              <span className="text-sm text-gray-400 ml-2">({post.role})</span>
+          <div
+            key={post._id}
+            className="p-4 border border-gray-700 rounded bg-gray-800"
+          >
+            <div className="flex justify-between items-center mb-2 text-sm text-gray-400">
+              <span>
+                {post.name} ({post.role})
+              </span>
+              <span>{new Date(post.timestamp).toLocaleString()}</span>
             </div>
 
-            <h3 className="text-lg font-bold mb-1">{post.title}</h3>
-            <p className="text-sm mb-3">{post.content}</p>
+            <p className="text-white mb-2">{post.content}</p>
 
             {post.imageUrl && (
               <img
-                src={`https://alumni-connect-portal.onrender.com${post.imageUrl}`}
-                alt="Post visual"
-                className="rounded max-w-full h-auto mb-3"
+                src={post.imageUrl}
+                alt="Post image"
+                className="rounded max-w-full border mb-3"
               />
             )}
 
-            {post.comments && post.comments.length > 0 && (
-              <div className="bg-gray-700 p-2 rounded mt-3">
-                <p className="text-sm font-semibold mb-1">💬 Comments:</p>
-                {post.comments.map((comment, index) => (
-                  <p key={index} className="text-sm text-gray-300">• {comment}</p>
-                ))}
-              </div>
-            )}
+            {/* Comments Section */}
+            <div className="space-y-2 mt-3">
+              {post.comments?.map((comment, idx) => (
+                <div key={idx} className="text-sm text-gray-300 space-y-1">
+                  💬 <strong>{comment.author}</strong>: {comment.text}
+                </div>
+              ))}
+            </div>
+
+            {/* Comment Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleComment(post._id, commentInputs[post._id] || "");
+                setCommentInputs((prev) => ({ ...prev, [post._id]: "" }));
+              }}
+              className="mt-3"
+            >
+              <input
+                name="comment"
+                placeholder="Write a comment..."
+                value={commentInputs[post._id] || ""}
+                onChange={(e) =>
+                  setCommentInputs((prev) => ({
+                    ...prev,
+                    [post._id]: e.target.value,
+                  }))
+                }
+                className="w-full px-3 py-2 rounded bg-gray-700 text-white"
+              />
+            </form>
           </div>
         ))}
       </div>
     </div>
   );
-};
-
-export default Feed;
+}

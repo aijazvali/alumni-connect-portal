@@ -1,18 +1,24 @@
-import Head from "next/head";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import CropImage from "@/components/CropImage";
 
 export default function Register() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "student",
-    batch: ""
+    role: "",
+    batch: "",
+    jobtitle: "",
+    branch: "",
+    location: "",
+    image: "",
   });
 
   const [message, setMessage] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [rawImage, setRawImage] = useState<File | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [cropping, setCropping] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -21,18 +27,49 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    let imageUrl = "";
+
+    if (image) {
+      const formDataImg = new FormData();
+      formDataImg.append("file", image);
+      formDataImg.append("upload_preset", "unsigned"); // Replace with your Cloudinary upload preset
+
+      try {
+        const cloudRes = await fetch("https://api.cloudinary.com/v1_1/dyl4tv4o6/image/upload", {
+          method: "POST",
+          body: formDataImg,
+        });
+        const cloudData = await cloudRes.json();
+        imageUrl = cloudData.secure_url;
+      } catch (err) {
+        setMessage("❌ Failed to upload image");
+        return;
+      }
+    }
+
     try {
       const res = await fetch("https://alumni-connect-portal.onrender.com/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ ...formData, image: imageUrl }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setMessage("✅ Registration successful!");
-        setTimeout(() => router.push("/login"), 1500);
+        setMessage("✅ Registered successfully!");
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          role: "",
+          batch: "",
+          jobtitle: "",
+          branch: "",
+          location: "",
+          image: "",
+        });
+        setImage(null);
       } else {
         setMessage(`❌ ${data.message}`);
       }
@@ -42,94 +79,117 @@ export default function Register() {
   };
 
   return (
-    <>
-      <Head>
-        <title>Register | Alumni Connect</title>
-      </Head>
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow">
+      <h1 className="text-2xl font-semibold mb-6">Register</h1>
 
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
-        <div className="bg-black shadow-md rounded px-6 py-8 w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-6 text-white">Register</h2>
-
-          {message && (
-            <div className="mb-4 p-3 rounded text-white bg-green-600 text-sm">{message}</div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm text-white mb-1">Full Name</label>
-              <input
-                type="text"
-                id="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter your full name"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm text-white mb-1">Email</label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm text-white mb-1">Password</label>
-              <input
-                type="password"
-                id="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
-                placeholder="Choose a strong password"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="role" className="block text-sm text-white mb-1">Role</label>
-              <select
-                id="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
-              >
-                <option value="student">Student</option>
-                <option value="alumni">Alumni</option>
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="batch" className="block text-sm text-white mb-1">Batch</label>
-              <input
-                type="text"
-                id="batch"
-                value={formData.batch}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
-                placeholder="e.g., 2022"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-            >
-              Register
-            </button>
-          </form>
+      {message && (
+        <div className="mb-4 p-3 rounded text-white bg-blue-600">
+          {message}
         </div>
-      </div>
-    </>
+      )}
+
+      {cropping && imageSrc && (
+        <CropImage
+          imageSrc={imageSrc}
+          onCancel={() => setCropping(false)}
+          onCropComplete={(croppedBlob: Blob) => {
+            setImage(new File([croppedBlob], "cropped.jpg", { type: "image/jpeg" }));
+            setCropping(false);
+          }}
+        />
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          id="name"
+          type="text"
+          placeholder="Name"
+          value={formData.name}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <select
+          id="role"
+          value={formData.role}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        >
+          <option value="">Select role</option>
+          <option value="student">Student</option>
+          <option value="alumni">Alumni</option>
+        </select>
+        <input
+          id="batch"
+          type="text"
+          placeholder="Batch (e.g. 2023)"
+          value={formData.batch}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="jobtitle"
+          type="text"
+          placeholder="Jobtitle"
+          value={formData.jobtitle}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="location"
+          type="text"
+          placeholder="Location"
+          value={formData.location}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          id="branch"
+          type="text"
+          placeholder="Branch"
+          value={formData.branch}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded"
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            setRawImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              setImageSrc(reader.result as string);
+              setCropping(true);
+            };
+            reader.readAsDataURL(file);
+          }}
+          className="w-full px-4 py-2 border rounded"
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Register
+        </button>
+      </form>
+    </div>
   );
 }
