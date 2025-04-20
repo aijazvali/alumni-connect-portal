@@ -8,10 +8,11 @@ export default function Login() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -19,32 +20,34 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setMessage("");
 
     try {
       const res = await fetch("https://alumni-connect-portal.onrender.com/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ Save token and user info in localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userRole", data.user.role);
-        localStorage.setItem("userId", data.user.id || data.user._id); // ✅ FIXED: save actual MongoDB userId
+        localStorage.setItem("userId", data.user._id);
 
         setMessage("✅ Login successful!");
         auth.setUser(data.user);
-
-        router.push("/home");
+        router.push("/user");
       } else {
-        setMessage(`❌ ${data.message}`);
+        setMessage("❌ ${data.message}");
       }
     } catch (err) {
       setMessage("❌ Server error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -54,40 +57,44 @@ export default function Login() {
         <title>Login | Alumni Connect</title>
       </Head>
 
-      <div className="flex justify-center items-center h-screen bg-gray-900">
-        <div className="bg-black shadow-md rounded px-8 py-6 w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-6 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black px-4">
+        <div className="w-full max-w-md p-8 rounded-2xl shadow-lg bg-black/60 backdrop-blur-md border border-gray-700">
+          <h2 className="text-3xl font-bold mb-6 text-center tracking-wide text-white">
             Login to Your Account
           </h2>
 
           {message && (
-            <div className="mb-4 p-3 rounded text-white bg-blue-600">
+            <div className="mb-4 p-3 rounded text-white bg-blue-600 text-center font-medium shadow">
               {message}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-white">Email</label>
+              <label htmlFor="email" className="block text-white">
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full px-4 py-3 border border-gray-700 rounded-lg bg-gray-950 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
                 placeholder="Enter your email"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-white">Password</label>
+              <label htmlFor="password" className="block text-white">
+                Password
+              </label>
               <input
                 type="password"
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full px-4 py-3 border border-gray-700 rounded-lg bg-gray-950 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
                 placeholder="Enter your password"
                 required
               />
@@ -95,9 +102,17 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-300"
+              disabled={isSubmitting}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md flex items-center justify-center"
             >
-              Login
+              {isSubmitting ? (
+                <>
+                  <span className="loader mr-2 w-4 h-4 border-2 border-t-transparent rounded-full animate-spin"></span>
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
           </form>
         </div>
