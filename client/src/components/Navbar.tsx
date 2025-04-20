@@ -83,14 +83,7 @@ export default function Navbar() {
           >
             Alumni
           </Link>
-          {auth.user && (
-            <Link
-              href="/profile"
-              className="block py-2 sm:py-0 hover:text-blue-400"
-            >
-              Profile
-            </Link>
-          )}
+      
           {userInfo ? (
             <>
               <Link
