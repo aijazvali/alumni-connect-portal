@@ -3,9 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { authhook } from "@/authcontext/Authcontext";
 
-
 export default function Login() {
-  const auth=authhook();
+  const auth = authhook();
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
@@ -14,12 +13,10 @@ export default function Login() {
 
   const [message, setMessage] = useState("");
 
-  // 🔄 Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // 🚀 Submit login request
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -33,14 +30,14 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
-        // ✅ Save token + user info
+        // ✅ Save token and user info in localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userRole", data.user.role);
-        localStorage.setItem("userId", data.user._id); // 👈 Make sure this exists in backend response
+        localStorage.setItem("userId", data.user.id || data.user._id); // ✅ FIXED: save actual MongoDB userId
 
         setMessage("✅ Login successful!");
-        auth.setUser(data.user)
+        auth.setUser(data.user);
 
         router.push("/dashboard");
       } else {
