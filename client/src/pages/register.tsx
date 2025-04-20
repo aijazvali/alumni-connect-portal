@@ -93,7 +93,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black text-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black text-white px-4 pt-8">
       <div className="w-full max-w-md p-8 rounded-2xl shadow-lg bg-black/60 backdrop-blur-md border border-gray-700">
         <h1 className="text-3xl font-bold mb-6 text-center tracking-wide">Create Your Account</h1>
 
@@ -171,7 +171,7 @@ export default function Register() {
             className="w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-white hover:file:bg-gray-700 cursor-pointer bg-gray-950 border border-gray-700 rounded-lg px-3 py-2"
           />
 
-          {/* Image preview */}
+         
           {imageSrc && !cropping && (
             <div className="mt-2">
               <img
