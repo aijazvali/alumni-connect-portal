@@ -53,9 +53,10 @@ export default function Navbar() {
     <nav className="bg-black text-white px-6 py-4 flex justify-between items-center">
       <h1 className="text-xl font-bold text-blue-400">
       <Link href="/" className="flex items-center gap-2">
-  <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
-  <span className="text-2xl font-bold text-blue-400">Back2Campus</span>
+  <img src="/logo.png" alt="Logo" className="h-16 w-auto" />
+  <span className="text-lg font-bold text-blue-400">Back2Campus</span>
 </Link>
+
 
       </h1>
 
