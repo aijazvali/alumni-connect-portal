@@ -40,7 +40,7 @@ export default function Login() {
 
         setMessage("✅ Login successful!");
         auth.setUser(data.user);
-        router.push("/user");
+        router.push("/home");
       } else {
         setMessage("❌ ${data.message}");
       }
