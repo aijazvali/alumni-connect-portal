@@ -1,90 +1,42 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { authhook } from "@/authcontext/Authcontext";
 
-export default function Navbar() {
-  const auth = authhook();
-  const [userInfo, setUserInfo] = useState<{
-    name?: string;
-    role?: string;
-  } | null>(null);
-  const router = useRouter();
-
-  const checkAuth = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setUserInfo(null);
-      return;
-    }
-
-    const name = localStorage.getItem("userName");
-    const role = localStorage.getItem("userRole");
-
-    setUserInfo({
-      name: name || "",
-      role: role || "",
-    });
-  };
+const Navbar = () => {
+  const [open, setOpen] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAuth();
-
-    const handleRouteChange = () => {
-      checkAuth();
-    };
-
-    router.events.on("routeChangeComplete", handleRouteChange);
-    return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userId");
-    setUserInfo(null);
-    router.push("/login");
-  };
+    setRole(localStorage.getItem("userRole"));
+    setName(localStorage.getItem("userName"));
+  }, []);
 
   return (
-    <nav className="bg-black text-white px-6 py-4 flex justify-between items-center">
-      <h1 className="text-xl font-bold text-blue-400">
-        <Link href="/">Alumni Connect</Link>
-      </h1>
+    <nav className="bg-black text-white px-4 py-3 shadow-md">
+      <div className="flex justify-between items-center">
+        <Link href="/" className="text-xl font-bold">🎓 Alumni Portal</Link>
+        <button
+          className="sm:hidden text-xl"
+          onClick={() => setOpen(!open)}
+          aria-label="Toggle menu"
+        >
+          ☰
+        </button>
+      </div>
 
-      <div className="flex items-center gap-4">
-        <Link href="/" className="hover:text-blue-400">Home</Link>
-        <Link href="/alumni" className="hover:text-blue-400">Alumni</Link>
-        {auth.user && <Link href="/profile">Profile</Link>}
-        
-        {userInfo ? (
-          <>
-            <Link href="/user">
-            👤 {userInfo.name} ({userInfo.role})
-            </Link>
-            <Link href="/dashboard" className="hover:text-blue-400">
-              Dashboard
-            </Link>
-            <Link href="/chat" className="text-pink-400 font-semibold hover:underline">
-              Messages
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="hover:text-red-500 transition"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link href="/login" className="hover:text-blue-400">Login</Link>
-            <Link href="/register" className="hover:text-blue-400">Register</Link>
-          </>
+      <div className={`${open ? "block" : "hidden"} sm:flex sm:items-center sm:gap-6 mt-3 sm:mt-0`}>
+        <Link href="/" className="block py-2 sm:py-0 hover:text-blue-400">Home</Link>
+        <Link href="/chat" className="block py-2 sm:py-0 hover:text-blue-400">Messages</Link>
+        <Link href="/dashboard" className="block py-2 sm:py-0 hover:text-blue-400">Dashboard</Link>
+
+        {name && (
+          <div className="mt-2 sm:mt-0 sm:ml-auto text-sm text-gray-300">
+            Logged in as <span className="font-semibold text-white">{name}</span> ({role})
+          </div>
         )}
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;
