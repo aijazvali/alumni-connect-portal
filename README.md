@@ -34,11 +34,12 @@ Back2Campus is a web-based platform that connects current students and alumni fr
 
 # Folder Structure
 
+```
 /client     → Next.js frontend
 /server     → Express backend
 /public     → Static assets like logo
 .env        → Environment config
-
+```
 ---
 
 # Contributing
