@@ -47,13 +47,14 @@ export default function Navbar() {
           <Image
             src="/logo.png"
             alt="Back2Campus Logo"
-            width={44}
-            height={44}
+            width={55}
+            height={55}
             className="h-11 w-auto object-contain"
           />
-          <span className="text-lg sm:text-xl font-bold text-blue-400">
+          <span className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-blue-400">
             Back2Campus
           </span>
+
         </Link>
 
         <button
