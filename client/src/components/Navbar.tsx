@@ -61,7 +61,7 @@ export default function Navbar() {
       </h1>
 
       <div className="flex items-center gap-4">
-        <Link href="/" className="hover:text-blue-400">Home</Link>
+        <Link href="/home" className="hover:text-blue-400">Home</Link>
         <Link href="/alumni" className="hover:text-blue-400">Alumni</Link>
         {auth.user && <Link href="/profile">Profile</Link>}
         
