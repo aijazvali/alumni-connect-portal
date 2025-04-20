@@ -70,9 +70,6 @@ export default function Navbar() {
             <Link href="/user">
             👤 {userInfo.name} ({userInfo.role})
             </Link>
-            <Link href="/dashboard" className="hover:text-blue-400">
-              Dashboard
-            </Link>
             <Link href="/chat" className="text-pink-400 font-semibold hover:underline">
               Messages
             </Link>

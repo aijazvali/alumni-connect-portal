@@ -1,9 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 import { authhook } from "@/authcontext/Authcontext";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
-
 
 function Page() {
   const auth = authhook();
@@ -19,16 +16,14 @@ function Page() {
   const [selectedField, setSelectedField] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFilter((prev) => ({
-      ...prev,
-      [id]: value
-    }));
-  };
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const alumniPerPage = 6;
+  const totalPages = Math.ceil(alumni.length / alumniPerPage);
 
   const filterhandler = () => {
     auth.setInputval(filter);
+    setCurrentPage(1); // reset to page 1 after filtering
   };
 
   const handleSortByBatch = (order: 'asc' | 'desc') => {
@@ -52,9 +47,14 @@ function Page() {
     auth.setAlumni(sorted);
   };
 
+  const currentAlumni = alumni.slice(
+    (currentPage - 1) * alumniPerPage,
+    currentPage * alumniPerPage
+  );
+
   return (
     <div className="text-white flex flex-col items-center min-h-screen p-4 bg-black">
-      {/* Filter + Button Section (First Line) */}
+      {/* Filter Section */}
       <div className="w-full max-w-4xl flex flex-col items-center gap-4">
         <div className="flex flex-wrap justify-center items-center gap-3 w-full">
           <select
@@ -96,11 +96,11 @@ function Page() {
           </button>
         </div>
 
-        {/* Sorting Section (Second Line) */}
+        {/* Sorting Section */}
         <div className="flex flex-wrap justify-center items-center gap-3 mt-1 w-full">
           <select
             onChange={(e) => handleSortByBatch(e.target.value as 'asc' | 'desc')}
-            className="bg-blue-600 text-white p-2 rounded w-[12rem] "
+            className="bg-blue-600 text-white p-2 rounded w-[12rem]"
           >
             <option value="">Sort by Batch</option>
             <option value="desc">Newest to Oldest</option>
@@ -118,33 +118,60 @@ function Page() {
         </div>
       </div>
 
-      {/* Alumni Display Section */}
+      {/* Alumni Cards */}
       <div className="w-full max-w-5xl mt-9 flex justify-center">
         {loading ? (
           <p>Loading...</p>
         ) : alumni.length === 0 ? (
           <p>No alumni found.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-            {alumni.map((alum, indx) => (
-              <div key={indx} className="border p-4 rounded shadow flex text-blue-400 gap-4 ">
-                <div className="max-w-[50%] flex items-center">
-                <img
-                  src={alum.image || "https://static.vecteezy.com/system/resources/previews/009/368/313/non_2x/scholarship-pixel-perfect-rgb-color-icon-for-dark-theme-financial-support-for-student-state-offered-grant-simple-filled-line-drawing-on-night-mode-background-editable-stroke-vector.jpg"}
-                  className="w-full h-auto object-contain rounded-lg"
-                  alt="Alumni avatar"
-                />
+          <div className="flex flex-col items-center w-full gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+              {currentAlumni.map((alum, indx) => (
+                <div key={indx} className="border p-4 rounded shadow flex text-blue-400 gap-4 w-full max-h-64">
+                  
+                  {/* Image Section */}
+                  <div className="w-1/2 h-full flex items-center justify-center">
+                    <img
+                      src={
+                        alum.image ||
+                        "https://static.vecteezy.com/system/resources/previews/009/368/313/non_2x/scholarship-pixel-perfect-rgb-color-icon-for-dark-theme-financial-support-for-student-state-offered-grant-simple-filled-line-drawing-on-night-mode-background-editable-stroke-vector.jpg"
+                      }
+                      className="w-full h-full object-cover rounded-lg"
+                      alt="Alumni avatar"
+                    />
+                  </div>
+
+                  {/* Text Section */}
+                  <div className="w-1/2 flex flex-col justify-around gap-2 break-words">
+                    <h2 className="text-xl text-blue-600 font-semibold">{alum.name}</h2>
+                    <p className="break-words">{alum.email}</p>
+                    <p><span className='text-blue-300'>Branch</span>: {alum.branch}</p>
+                    <p><span className='text-blue-300'>Batch</span>: {alum.batch}</p>
+                    <p><span className='text-blue-300'>Jobtitle</span>: {alum.jobtitle}</p>
+                    <p><span className='text-blue-300'>Location</span>: {alum.location}</p>
+                  </div>
+
                 </div>
-                <div className="flex flex-col justify-around gap-2">
-                  <h2 className="text-xl text-blue-600 font-semibold">{alum.name}</h2>
-                  <p>{alum.email}</p>
-                  <p>{alum.branch}</p>
-                  <p>Batch: {alum.batch}</p>
-                  <p>{alum.jobtitle}</p>
-                  <p>{alum.location}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center mt-4 gap-2 flex-wrap">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === i + 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-white"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
