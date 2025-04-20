@@ -11,6 +11,8 @@ interface User {
 const ChatListPage = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [search, setSearch] = useState("");
+  const [sortAsc, setSortAsc] = useState(true);
   const currentUserId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
   useEffect(() => {
@@ -18,7 +20,6 @@ const ChatListPage = () => {
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          console.log("🔍 User list with image field:", data); // Debugging aid
           const filtered = data.filter((u) => u._id !== currentUserId);
           setUsers(filtered);
         }
@@ -26,12 +27,41 @@ const ChatListPage = () => {
       .catch((err) => console.error("Error fetching users", err));
   }, [currentUserId]);
 
+  // Filtered + Sorted Users
+  const filteredUsers = users
+    .filter((user) =>
+      user.name.toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) => {
+      return sortAsc
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    });
+
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <h1 className="text-2xl font-bold mb-6 text-center">Start a Chat</h1>
 
+      {/* Search + Sort Controls */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="px-4 py-2 rounded bg-gray-700 text-white w-full sm:w-1/2"
+        />
+        <button
+          onClick={() => setSortAsc(!sortAsc)}
+          className="px-4 py-2 bg-blue-600 rounded text-white hover:bg-blue-500 transition"
+        >
+          Sort: {sortAsc ? "A → Z" : "Z → A"}
+        </button>
+      </div>
+
+      {/* User Cards Grid */}
       <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {users.map((user) => (
+        {filteredUsers.map((user) => (
           <button
             key={user._id}
             onClick={() => router.push(`/chat/${user._id}`)}
