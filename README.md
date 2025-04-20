@@ -30,6 +30,7 @@ Back2Campus is a web-based platform that connects current students and alumni fr
 - Comment on posts for discussions
 - Editable Profiles for alumini
 - Private 1-on-1 messaging system (Little Buggy)
+- Optimzed for mobile devices
 
 ---
 
