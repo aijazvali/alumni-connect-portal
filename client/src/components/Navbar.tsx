@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { authhook } from "@/authcontext/Authcontext";
+import Image from "next/image";
 
 export default function Navbar() {
   const auth = authhook();
@@ -35,15 +36,24 @@ export default function Navbar() {
     localStorage.removeItem("userRole");
     localStorage.removeItem("userId");
     setUserInfo(null);
-    router.push("/login");
+    router.push("/");
   };
 
   return (
-    <nav className="bg-black text-white px-6 py-4">
+    <nav className="bg-black text-white px-6 py-4 shadow-md">
       <div className="flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Logo" className="h-14 w-auto" />
-          <span className="text-lg font-bold text-blue-400">Back2Campus</span>
+        {/* ✅ Logo + Title Block */}
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt="Back2Campus Logo"
+            width={44}
+            height={44}
+            className="h-11 w-auto object-contain"
+          />
+          <span className="text-lg sm:text-xl font-bold text-blue-400">
+            Back2Campus
+          </span>
         </Link>
 
         <button
@@ -55,13 +65,12 @@ export default function Navbar() {
         </button>
       </div>
 
+      {/* ✅ Responsive Navigation Links */}
       <div className={`mt-3 sm:mt-0 ${isOpen ? "block" : "hidden"} sm:flex sm:items-center sm:justify-end sm:gap-6`}>
         <Link href="/home" className="block py-2 sm:py-0 hover:text-blue-400">Home</Link>
         <Link href="/alumni" className="block py-2 sm:py-0 hover:text-blue-400">Alumni</Link>
         {auth.user && (
-          <Link href="/profile" className="block py-2 sm:py-0 hover:text-blue-400">
-            Profile
-          </Link>
+          <Link href="/profile" className="block py-2 sm:py-0 hover:text-blue-400">Profile</Link>
         )}
 
         {userInfo ? (
