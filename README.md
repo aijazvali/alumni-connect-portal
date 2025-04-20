@@ -24,11 +24,12 @@ Back2Campus is a web-based platform that connects current students and alumni fr
 # Features
 
 - Separate login/register for Students and Alumni
-- Create and view posts with image uploads
-- Comment on posts
-- Private 1-on-1 messaging system
-- Filter alumni by batch
-- Fully responsive UI
+- Hashed passwords
+- Filter alumni by various fields
+- A Feed page to create and view post with image uploads
+- Comment on posts for discussions
+- Editable Profiles for alumini
+- Private 1-on-1 messaging system (Little Buggy)
 
 ---
 

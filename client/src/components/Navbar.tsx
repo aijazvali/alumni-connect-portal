@@ -6,7 +6,10 @@ import Image from "next/image";
 
 export default function Navbar() {
   const auth = authhook();
-  const [userInfo, setUserInfo] = useState<{ name?: string; role?: string } | null>(null);
+  const [userInfo, setUserInfo] = useState<{
+    name?: string;
+    role?: string;
+  } | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -41,7 +44,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-black text-white px-6 py-4 shadow-md">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap justify-between items-center max-w-7xl mx-auto">
         {/* ✅ Logo + Title Block */}
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -51,50 +54,81 @@ export default function Navbar() {
             height={55}
             className="h-11 w-auto object-contain"
           />
-          <span className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-blue-400">
+          <span className="text-lg sm:text-xl md:text-2xl font-bold text-blue-400">
             Back2Campus
           </span>
-
         </Link>
 
+        {/* ✅ Hamburger Button */}
         <button
-          className="sm:hidden text-2xl"
+          className="sm:hidden text-2xl ml-auto"
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
         >
           ☰
         </button>
-      </div>
 
-      {/* ✅ Responsive Navigation Links */}
-      <div className={`mt-3 sm:mt-0 ${isOpen ? "block" : "hidden"} sm:flex sm:items-center sm:justify-end sm:gap-6`}>
-        <Link href="/home" className="block py-2 sm:py-0 hover:text-blue-400">Feed</Link>
-        <Link href="/alumni" className="block py-2 sm:py-0 hover:text-blue-400">Alumni</Link>
-        {auth.user && (
-          <Link href="/profile" className="block py-2 sm:py-0 hover:text-blue-400">Profile</Link>
-        )}
-
-        {userInfo ? (
-          <>
-            <Link href="/user" className="block py-2 sm:py-0 hover:text-blue-400">
-              👤 {userInfo.name} ({userInfo.role})
-            </Link>
-            <Link href="/chat" className="block py-2 sm:py-0 text-pink-400 font-semibold hover:underline">
-              Messages
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="block py-2 sm:py-0 hover:text-red-500"
+        {/* ✅ Nav Links */}
+        <div
+          className={`w-full sm:w-auto mt-4 sm:mt-0 ${
+            isOpen ? "block" : "hidden"
+          } sm:flex sm:items-center sm:gap-6 text-sm sm:text-base`}
+        >
+          <Link href="/home" className="block py-2 sm:py-0 hover:text-blue-400">
+            Feed
+          </Link>
+          <Link
+            href="/alumni"
+            className="block py-2 sm:py-0 hover:text-blue-400"
+          >
+            Alumni
+          </Link>
+          {auth.user && (
+            <Link
+              href="/profile"
+              className="block py-2 sm:py-0 hover:text-blue-400"
             >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link href="/login" className="block py-2 sm:py-0 hover:text-blue-400">Login</Link>
-            <Link href="/register" className="block py-2 sm:py-0 hover:text-blue-400">Register</Link>
-          </>
-        )}
+              Profile
+            </Link>
+          )}
+          {userInfo ? (
+            <>
+              <Link
+                href="/user"
+                className="block py-2 sm:py-0 hover:text-blue-400"
+              >
+                👤 {userInfo.name} ({userInfo.role})
+              </Link>
+              <Link
+                href="/chat"
+                className="block py-2 sm:py-0 text-pink-400 font-semibold hover:underline"
+              >
+                Messages
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="block py-2 sm:py-0 hover:text-red-500"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="block py-2 sm:py-0 hover:text-blue-400"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="block py-2 sm:py-0 hover:text-blue-400"
+              >
+                Register
+              </Link>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
