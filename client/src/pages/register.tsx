@@ -32,7 +32,7 @@ export default function Register() {
     if (image) {
       const formDataImg = new FormData();
       formDataImg.append("file", image);
-      formDataImg.append("upload_preset", "unsigned"); // Replace with your Cloudinary upload preset
+      formDataImg.append("upload_preset", "unsigned"); // Replace with your Cloudinary preset
 
       try {
         const cloudRes = await fetch("https://api.cloudinary.com/v1_1/dyl4tv4o6/image/upload", {
@@ -71,7 +71,7 @@ export default function Register() {
         });
         setImage(null);
       } else {
-        setMessage(`❌ ${data.message}`);
+        setMessage("❌ ${data.message}");
       }
     } catch (err) {
       setMessage("❌ Server error");
@@ -79,7 +79,7 @@ export default function Register() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow">
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow bg-black text-white">
       <h1 className="text-2xl font-semibold mb-6">Register</h1>
 
       {message && (
@@ -106,7 +106,7 @@ export default function Register() {
           placeholder="Name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         />
         <input
           id="email"
@@ -114,7 +114,7 @@ export default function Register() {
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         />
         <input
           id="password"
@@ -122,13 +122,13 @@ export default function Register() {
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         />
         <select
           id="role"
           value={formData.role}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         >
           <option value="">Select role</option>
           <option value="student">Student</option>
@@ -140,7 +140,7 @@ export default function Register() {
           placeholder="Batch (e.g. 2023)"
           value={formData.batch}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         />
         <input
           id="jobtitle"
@@ -148,7 +148,7 @@ export default function Register() {
           placeholder="Jobtitle"
           value={formData.jobtitle}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         />
         <input
           id="location"
@@ -156,7 +156,7 @@ export default function Register() {
           placeholder="Location"
           value={formData.location}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         />
         <input
           id="branch"
@@ -164,7 +164,7 @@ export default function Register() {
           placeholder="Branch"
           value={formData.branch}
           onChange={handleChange}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white"
         />
         <input
           type="file"
@@ -180,7 +180,7 @@ export default function Register() {
             };
             reader.readAsDataURL(file);
           }}
-          className="w-full px-4 py-2 border rounded"
+          className="w-full px-4 py-2 border rounded bg-black text-white file:bg-gray-800 file:text-white file:rounded file:border-0 file:mr-2"
         />
 
         <button
